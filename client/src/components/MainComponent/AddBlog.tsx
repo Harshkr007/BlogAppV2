@@ -32,7 +32,7 @@ function AddBlog() {
                 {...register("title", { required: true })}
                 type="text"
                 className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                placeholder="Enter blog title:"
+                placeholder="Enter blog title"
               />
             </div>
 
