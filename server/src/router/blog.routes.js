@@ -26,14 +26,11 @@ routes.post('/create', authenticate, uploadFile, handleCreateBlog);
 
 routes.get('/allBlogs', authenticate, handleGetAllBlogs);
 
+routes.get('/allUserBlogs/:id', authenticate, handleGetAllBlogsByUser);
 
+routes.put('/edit/:id', authenticate,uploadFile, handleEditBlog);
 
-
-routes.post('/allUserBlogs', authenticate, handleGetAllBlogsByUser);
-
-routes.put('/edit', authenticate,uploadFile, handleEditBlog);
-
-routes.delete('/delete', authenticate, handleDeleteBlog);
+routes.delete('/delete/:id', authenticate, handleDeleteBlog);
 
 //comments operations
 

@@ -8,11 +8,11 @@ function Home() {
       <div className="bg-blue-300 h-20 flex items-center px-12 flex-shrink-0">
         <Header />
       </div>
-      <div className="grid grid-cols-5 flex-grow overflow-hidden">
-        <div className="col-span-1 overflow-y-auto">
+      <div className="grid grid-cols-5 flex-grow">
+        <div className="col-span-1 h-[calc(100vh-5rem)]">
           <Sidebar />
         </div>
-        <div className="col-span-4">
+        <div className="col-span-4 overflow-y-auto">
           <Outlet />
         </div>
       </div>

@@ -6,7 +6,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { deleteOnCloudinary, getPublicIdFromUrl, updateOnCloudinary, uploadOnCloudinary } from "../utils/Cloudinary.js";
-import mongoose from "mongoose";
+import mongoose, { get } from "mongoose";
 
 const handleCreateBlog = asyncHandler(async (req, res) => {
     const { title, description } = req.body;
@@ -112,7 +112,7 @@ const handleGetAllBlogs = asyncHandler(async (req, res) => {
 
 const handleGetAllBlogsByUser = asyncHandler(async (req, res) => {
     // console.log(req)
-    const userNameorEmail = req.query.userNameorEmail;
+    const userNameorEmail = req.query.id || req.params.id;
     console.log(req.query);
     console.log(userNameorEmail);
 
@@ -136,9 +136,10 @@ const handleGetAllBlogsByUser = asyncHandler(async (req, res) => {
         likesCount: blog.likes.length,
         commentsCount: blog.comments.length,
         createdAt: blog.createdAt,
-        userLiked:blog.likes.includes(userId),
+        userLiked:blog.likes.includes(user._id)
     }));
 
+    console.log(sanitizedBlogs);
     const response = new ApiResponse(200, "Blogs fetched successfully", {
         sanitizedBlogs,
         UpdatedUser: {
@@ -185,7 +186,7 @@ const handleEditBlog = asyncHandler(async (req, res) => {
     let imageUrl = null;
     if (avatar) {
 
-        imageUrl = await updateOnCloudinary(blog.image, avatar.path);
+        imageUrl = await updateOnCloudinary(getPublicIdFromUrl(blog.image), avatar.path);
 
         if (!imageUrl) {
             throw new ApiError(500, "Failed to upload image");

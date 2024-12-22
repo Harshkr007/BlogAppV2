@@ -1,27 +1,15 @@
 import React, { useState } from 'react';
-import {  useDispatch, useSelector } from 'react-redux';
 import { useCommentBlogMutation, useGetCommentsQuery } from '../../store/blog/blogApiSlice';
 import { useLocation } from 'react-router-dom';
 import Loading from '../Loader/Loading';
 import toast from 'react-hot-toast';
 import {useNavigate} from 'react-router-dom';
-import { useUpdateUserData } from '../../utils/updateUserData';
-import { setCredentials } from '../../store/user/userSlice';
 
 function CommentPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const updateUserData = useUpdateUserData();
-  const dispatch = useDispatch();
 
   const [comment, setComment] = useState('');
-  const user = useSelector((state: any) => state.user.user);
-  dispatch((setCredentials({
-    user: user,
-    accessToken: user.accessToken,
-  })));
-
-  
 
   const blogId = location.pathname.split('/')[2].replace(':', '');
 
@@ -55,12 +43,9 @@ function CommentPage() {
     console.log(blogId, comment);
 
     try {
-        const response =  await commentBlog({ id: blogId, comment: { text: comment, user: user._id } });
+        const response =  await commentBlog({ id: blogId, comment: { text: comment} });
         console.log(response);
         toast.success('Comment added successfully');
-        if(response.data.UpdatedUser){
-            updateUserData(response.data.UpdatedUser);
-        }
         setComment('');
         navigate(`/comment/:${blogId}`)
     } catch (error) {
@@ -70,15 +55,15 @@ function CommentPage() {
   };
 
   return (
-    <div className="w-full h-screen grid grid-rows-5 p-4">
+    <div className="h-[calc(100vh-5rem)] p-4 flex flex-col">
       {/* Comment Input Section */}
-      <div className="row-span-1 mb-4">
-        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2 h-full">
+      <div className="flex-shrink-0 mb-4">
+        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2">
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Add a comment..."
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-grow"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
           />
           <button
@@ -91,25 +76,24 @@ function CommentPage() {
       </div>
 
       {/* Comments List Section */}
-      <div className="row-span-4 overflow-y-auto  scrollbar-track-slate-100 scrollbar-thumb-blue-300 scrollbar-thin hover:scrollbar-thumb-blue-400 scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-      mb-14">
-        {
-           comments?.data?.sanitizedComments?.length > 0 ?(
-            comments?.data?.sanitizedComments?.map((comment: any) => (
-                    <div key={comment._id} className="mb-4 p-4 border border-gray-200 rounded-md">
-                      <div className="flex items-center gap-2 mb-2">
-                        <img
-                          src={comment.avatar}
-                          alt="user avatar"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <span className="font-medium">{comment.userName}</span>
-                      </div>
-                      <p className="text-gray-700">{comment.text}</p>
-                    </div>
-                  ))
-            ):<div>No Comments</div>
-        }
+      <div className="flex-grow overflow-y-auto scrollbar-track-slate-100 scrollbar-thumb-blue-300 scrollbar-thin hover:scrollbar-thumb-blue-400 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
+        {comments?.data?.sanitizedComments?.length > 0 ? (
+          comments?.data?.sanitizedComments?.map((comment: any) => (
+            <div key={comment._id} className="mb-4 p-4 border border-gray-200 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <img
+                  src={comment.avatar}
+                  alt="user avatar"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="font-medium">{comment.userName}</span>
+              </div>
+              <p className="text-gray-700">{comment.text}</p>
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500">No Comments</div>
+        )}
       </div>
     </div>
   );

@@ -2,10 +2,18 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
+import {useCreateBlogMutation} from "../../store/blog/blogApiSlice";
+import toast from "react-hot-toast";
+import Loading from "../Loader/Loading";
+
+
+
 function AddBlog() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading,setLoading] = useState(false);
+  const [createBlog] = useCreateBlogMutation();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -14,12 +22,32 @@ function AddBlog() {
     }
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    setLoading(true); // Set loading state before API call
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    formData.append("avatar", data.blogImage[0]);
+    
+    try {
+      const response = await createBlog(formData);
+      if(response.data){
+        toast.success("Blog posted successfully");
+        navigate("/");
+      } else {
+        toast.error("Failed to post blog");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error creating blog");
+    } finally {
+      setLoading(false); // Set loading state after all operations
+    }
   };
+  
 
   return (
-    <div className="h-full p-6">
+    loading?(<Loading/>):(<div className="h-full p-6">
       <div className="h-full border border-gray-900 rounded-lg p-8 flex flex-col">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -87,7 +115,7 @@ function AddBlog() {
           </div>
         </form>
       </div>
-    </div>
+    </div>)
   );
 }
 
