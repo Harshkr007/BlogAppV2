@@ -2,15 +2,22 @@ import React from 'react'
 import Logo from './Logo';
 import { IoSearchOutline } from "react-icons/io5";
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 function Header() {
   const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearchText(newValue);
-    console.log(newValue);
+    handleSearch(newValue);
   };
+
+  const handleSearch = (value: string) => {
+    navigate("/searchBlog", { state: { search: value } });
+  }
 
   return (
     <div className='flex justify-between items-center w-full'>
@@ -25,9 +32,9 @@ function Header() {
           className='outline-none w-28'
           value={searchText}
           onChange={handleInputChange}
+          onClick={() => handleSearch(searchText)}
         />
       </div>
     </div>
   )
-}
-export default Header;
+}export default Header;
